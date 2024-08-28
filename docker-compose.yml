@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  go-builder:
+    image: golang:latest
+    volumes:
+      - ./src:/app
+      - ./build:/build
+    working_dir: /app
+    environment:
+      - TARGET_OS=${TARGET_OS}  # This variable is passed from the script
+      - FILE_EXT=${FILE_EXT}    # This variable is passed from the script
+    command: sh -c "go build -o /build/forza-telemetry-receiver-${TARGET_OS}${FILE_EXT} && echo 'Compiled for ${TARGET_OS}${FILE_EXT}'"
