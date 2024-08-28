@@ -2,20 +2,22 @@ package main
 
 import (
 	"fmt"
+	"forza_telemetry/packet"
 	"net"
 )
 
 // Define a callback type
-type DataHandler func(data string, addr *net.UDPAddr)
+type DataHandler func(data []byte, len int, addr *net.UDPAddr)
 
-func main() {
-	listenAddr := "0.0.0.0:5300"
+func setupUDPServer(address string) {
+	listenAddr := address
 	udpAddr, _ := net.ResolveUDPAddr("udp", listenAddr)
 	conn, _ := net.ListenUDP("udp", udpAddr)
 	defer conn.Close()
 
 	// Start listening
-	go listenUDP(conn, handleData)
+	go listenUDP(conn, packet.Handler)
+	fmt.Println("Starting udp server, listening at", address)
 
 	// Keep the main goroutine running.
 	select {}
@@ -23,7 +25,7 @@ func main() {
 
 // Listen for UDP packets and invoke the callback.
 func listenUDP(conn *net.UDPConn, callback DataHandler) {
-	buffer := make([]byte, 1024)
+	buffer := make([]byte, 2048)
 	for {
 		n, addr, err := conn.ReadFromUDP(buffer)
 		if err != nil {
@@ -31,11 +33,12 @@ func listenUDP(conn *net.UDPConn, callback DataHandler) {
 			continue
 		}
 		// Trigger the callback with data and sender address
-		callback(string(buffer[:n]), addr)
+		callback(buffer[:n], n, addr)
 	}
 }
 
-// Define your handler function
-func handleData(data string, addr *net.UDPAddr) {
-	fmt.Printf("Received from %v: %s\n", addr, data)
+func main() {
+	// Setup UDP server on localhost port 5300
+	setupUDPServer("127.0.0.1:5300")
+	// setupUDPServer("0.0.0.0:5300")
 }
