@@ -1,11 +1,11 @@
-package packet
+package handler
 
 import (
 	"fmt"
 )
 
 func hexDump(data []byte) {
-	length := 8
+	length := 16
 
 	index := 0
 	for index < len(data) {
@@ -17,9 +17,9 @@ func hexDump(data []byte) {
 		} else {
 			copy(temp_hexs, data[index:index+length])
 		}
-		dumperHex(temp_hexs, 30)
+		dumperHex(temp_hexs, (length*3)+3)
 		// padPrint(8, " ")
-		dumper(temp_hexs, len(temp_hexs))
+		dumper(temp_hexs, length)
 		clearList(temp_hexs)
 		fmt.Print("\n")
 		index += length
@@ -135,10 +135,4 @@ func dumper(byte_list []byte, length int) {
 	// 		fmt.Print(".")
 	// 	}
 	// }
-}
-
-func padPrint(pad int, character string) {
-	for range pad {
-		fmt.Print(character)
-	}
 }
